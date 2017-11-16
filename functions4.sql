@@ -19,24 +19,29 @@ BEGIN
     FETCH casts INTO cas;
     EXIT WHEN NOT FOUND;
 
-		FOREACH actor_s in array string_to_array(cas.cast_, ',')
-		LOOP
-			
+    	IF (cas.cast_ IS NOT NULL) THEN
 
-			IF EXISTS (SELECT id_actor
-				FROM actor
-				WHERE nombre = RTRIM(LTRIM(LOWER(actor_s)))) THEN
-				new_id_actor = (SELECT id_actor
-							FROM actor
-							WHERE nombre = RTRIM(LTRIM(LOWER(actor_s))));
-			ELSE
-				new_id_actor = (SELECT MAX(id_actor)
-								FROM actor) +1;
-			END IF;
+			FOREACH actor_s in array string_to_array(cas.cast_, ',')
+			LOOP
+				
 
+				IF EXISTS (SELECT id_actor
+					FROM actor
+					WHERE nombre = RTRIM(LTRIM(LOWER(actor_s)))) THEN
+					new_id_actor = (SELECT id_actor
+								FROM actor
+								WHERE nombre = RTRIM(LTRIM(LOWER(actor_s))));
+				ELSE
+					new_id_actor = (SELECT MAX(id_actor)
+									FROM actor) +1;
+				END IF;
 
-	    
-	    END LOOP;
+				INSERT INTO actor 
+		    	VALUES (new_id_actor, RTRIM(LTRIM(LOWER(actor_s))), 0)
+		    	ON CONFLICT DO NOTHING;
+		    
+		    END LOOP;
+		END IF;
 
 	END LOOP;
 END;
