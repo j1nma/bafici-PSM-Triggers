@@ -23,20 +23,17 @@ BEGIN
 
 				IF EXISTS (SELECT id_actor
 					FROM actor
-					-- WHERE nombre = RTRIM(LTRIM(LOWER(actor_s)))) THEN
 					WHERE nombre = REGEXP_REPLACE(REGEXP_REPLACE(LOWER(actor_s), '^\s+', ''), '\s+$', '')) THEN
 					new_id_actor = (SELECT id_actor
 								FROM actor
-								-- WHERE nombre = RTRIM(LTRIM(LOWER(actor_s))));
 								WHERE nombre = REGEXP_REPLACE(REGEXP_REPLACE(LOWER(actor_s), '^\s+', ''), '\s+$', ''));
 				ELSE
-					new_id_actor = (SELECT MAX(id_actor)
-									FROM actor) +1;
+					new_id_actor = (SELECT COALESCE(MAX(id_actor),1)
+									FROM actor) + 1;
 				END IF;
 
 				INSERT INTO actor 
 		    	VALUES (new_id_actor, REGEXP_REPLACE(REGEXP_REPLACE(LOWER(actor_s), '^\s+', ''), '\s+$', ''), 0)
-		    	-- VALUES (new_id_actor, RTRIM(LTRIM(LOWER(actor_s))), 0)
 		    	ON CONFLICT DO NOTHING;
 		    
 		    END LOOP;

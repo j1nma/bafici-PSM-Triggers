@@ -21,6 +21,7 @@ OPEN actores;
 		LOOP
 			INSERT INTO actua
 			VALUES (actor.id_actor, pelicula.id_film)
+
 			ON CONFLICT DO NOTHING;
 		END LOOP;
 	END LOOP;
